@@ -413,20 +413,10 @@ namespace Microsoft.WindowsAzure.Storage.Blob
 
                 // Determines whether to use the normal, single-stream upload approach or the new parallel, multi-stream strategy.
                 bool useSingleStream = this.streamWriteSizeInBytes < Constants.MinLargeBlockSize 
-                    || (modifiedOptions.StoreBlobContentMD5.HasValue && modifiedOptions.StoreBlobContentMD5.Value); 
+                    || (modifiedOptions.StoreBlobContentMD5.HasValue && modifiedOptions.StoreBlobContentMD5.Value);
 
-                if (useSingleStream)
-                {
-                    using (Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
-                    {
-                        await this.UploadFromStreamAsync(stream, accessCondition, modifiedOptions, operationContext, cancellationToken);
-                    }
-                }
-                else
-                {
-                    CheckAdjustBlockSize(new FileInfo(path).Length);
-                    await this.UploadFromMultiStreamAsync(OpenMultiFileStream(path), accessCondition, modifiedOptions, operationContext, cancellationToken);
-                }
+                CheckAdjustBlockSize(new FileInfo(path).Length);
+                await this.UploadFromMultiStreamAsync(OpenMultiFileStream(path), accessCondition, modifiedOptions, operationContext, cancellationToken);
             }, cancellationToken);
         }
 #endif
